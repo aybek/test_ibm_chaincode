@@ -82,7 +82,7 @@ func (t *AssetManagementChaincode) assign(stub shim.ChaincodeStubInterface, args
 	}
 
 	asset := args[0]
-    fmt.Println("Asset = ", asset)	
+    fmt.Println("Asset = ", args[1])	
 	owner, err := base64.StdEncoding.DecodeString(args[1])
 	if err != nil {
 		return nil, errors.New("Failed decodinf owner")
@@ -94,7 +94,7 @@ func (t *AssetManagementChaincode) assign(stub shim.ChaincodeStubInterface, args
 	adminCertificate, err := stub.GetState("admin")
 
 	fmt.Println("Got admin state from stub")
-	
+
 	if err != nil {
 		return nil, errors.New("Failed fetching admin identity")
 	}
