@@ -57,25 +57,25 @@ func (t *AssetManagementChaincode) Init(stub shim.ChaincodeStubInterface, functi
 	// The metadata will contain the certificate of the administrator
 	adminCert, err := stub.GetCallerMetadata()
 	if err != nil {
-//		myLogger.Debug("Failed getting metadata")
+		fmt.Println("Failed getting metadata")
 		return nil, errors.New("Failed getting metadata.")
 	}
 	if len(adminCert) == 0 {
-//		myLogger.Debug("Invalid admin certificate. Empty.")
+		fmt.Println("Invalid admin certificate. Empty.")
 		return nil, errors.New("Invalid admin certificate. Empty.")
 	}
 
-//	myLogger.Debug("The administrator is [%x]", adminCert)
+	fmt.Println("The administrator is [%x]", adminCert)
 
 	stub.PutState("admin", adminCert)
 
-//	myLogger.Debug("Init Chaincode...done")
+	fmt.Println("Init Chaincode...done")
 
 	return nil, nil
 }
 
 func (t *AssetManagementChaincode) assign(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
-//	myLogger.Debug("Assign...")
+	fmt.Println("Assign...")
 
 	if len(args) != 2 {
 		return nil, errors.New("Incorrect number of arguments. Expecting 2")
@@ -103,7 +103,7 @@ func (t *AssetManagementChaincode) assign(stub shim.ChaincodeStubInterface, args
 	}
 
 	// Register assignment
-//	myLogger.Debugf("New owner of [%s] is [% x]", asset, owner)
+	fmt.Printlnf("New owner of [%s] is [% x]", asset, owner)
 
 	ok, err = stub.InsertRow("AssetsOwnership", shim.Row{
 		Columns: []*shim.Column{
@@ -115,13 +115,13 @@ func (t *AssetManagementChaincode) assign(stub shim.ChaincodeStubInterface, args
 		return nil, errors.New("Asset was already assigned.")
 	}
 
-//	myLogger.Debug("Assign...done!")
+	fmt.Println("Assign...done!")
 
 	return nil, err
 }
 
 func (t *AssetManagementChaincode) transfer(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
-//	myLogger.Debug("Transfer...")
+	fmt.Println("Transfer...")
 
 	if len(args) != 2 {
 		return nil, errors.New("Incorrect number of arguments. Expecting 2")
@@ -145,7 +145,7 @@ func (t *AssetManagementChaincode) transfer(stub shim.ChaincodeStubInterface, ar
 	}
 
 	prvOwner := row.Columns[1].GetBytes()
-//	myLogger.Debugf("Previous owener of [%s] is [% x]", asset, prvOwner)
+	fmt.Printlnf("Previous owener of [%s] is [% x]", asset, prvOwner)
 	if len(prvOwner) == 0 {
 		return nil, fmt.Errorf("Invalid previous owner. Nil")
 	}
@@ -180,15 +180,15 @@ func (t *AssetManagementChaincode) transfer(stub shim.ChaincodeStubInterface, ar
 		return nil, errors.New("Failed inserting row.")
 	}
 
-//	myLogger.Debug("New owner of [%s] is [% x]", asset, newOwner)
+	fmt.Println("New owner of [%s] is [% x]", asset, newOwner)
 
-//	myLogger.Debug("Transfer...done")
+	fmt.Println("Transfer...done")
 
 	return nil, nil
 }
 
 func (t *AssetManagementChaincode) isCaller(stub shim.ChaincodeStubInterface, certificate []byte) (bool, error) {
-//	myLogger.Debug("Check caller...")
+	fmt.Println("Check caller...")
 
 	// In order to enforce access control, we require that the
 	// metadata contains the signature under the signing key corresponding
@@ -219,10 +219,10 @@ func (t *AssetManagementChaincode) isCaller(stub shim.ChaincodeStubInterface, ce
 	// 	return false, errors.New("Failed getting binding")
 	// }
 
-	// myLogger.Debugf("passed certificate [% x]", certificate)
-	// myLogger.Debugf("passed sigma [% x]", sigma)
-	// myLogger.Debugf("passed payload [% x]", payload)
-	// myLogger.Debugf("passed binding [% x]", binding)
+	// fmt.Printlnf("passed certificate [% x]", certificate)
+	// fmt.Printlnf("passed sigma [% x]", sigma)
+	// fmt.Printlnf("passed payload [% x]", payload)
+	// fmt.Printlnf("passed binding [% x]", binding)
 
 // 	ok, err := stub.VerifySignature(
 // 		certificate,
@@ -237,7 +237,7 @@ func (t *AssetManagementChaincode) isCaller(stub shim.ChaincodeStubInterface, ce
 // //		myLogger.Error("Invalid signature")
 // 	}
 
-//	myLogger.Debug("Check caller...Verified!")
+	fmt.Println("Check caller...Verified!")
 
 	return ok, err
 }
@@ -268,7 +268,7 @@ func (t *AssetManagementChaincode) Invoke(stub shim.ChaincodeStubInterface, func
 // "query(asset)": returns the owner of the asset.
 // Anyone can invoke this function.
 func (t *AssetManagementChaincode) Query(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
-//	myLogger.Debugf("Query [%s]", function)
+	fmt.Printlnf("Query [%s]", function)
 
 	if function != "query" {
 		return nil, errors.New("Invalid query function name. Expecting 'query' but found '" + function + "'")
@@ -277,14 +277,14 @@ func (t *AssetManagementChaincode) Query(stub shim.ChaincodeStubInterface, funct
 	var err error
 
 	if len(args) != 1 {
-//		myLogger.Debug("Incorrect number of arguments. Expecting name of an asset to query")
+		fmt.Println("Incorrect number of arguments. Expecting name of an asset to query")
 		return nil, errors.New("Incorrect number of arguments. Expecting name of an asset to query")
 	}
 
 	// Who is the owner of the asset?
 	asset := args[0]
 
-//	myLogger.Debugf("Arg [%s]", string(asset))
+	fmt.Printlnf("Arg [%s]", string(asset))
 
 	var columns []shim.Column
 	col1 := shim.Column{Value: &shim.Column_String_{String_: asset}}
@@ -292,11 +292,11 @@ func (t *AssetManagementChaincode) Query(stub shim.ChaincodeStubInterface, funct
 
 	row, err := stub.GetRow("AssetsOwnership", columns)
 	if err != nil {
-//		myLogger.Debugf("Failed retriving asset [%s]: [%s]", string(asset), err)
+		fmt.Printlnf("Failed retriving asset [%s]: [%s]", string(asset), err)
 		return nil, fmt.Errorf("Failed retriving asset [%s]: [%s]", string(asset), err)
 	}
 
-//	myLogger.Debugf("Query done [% x]", row.Columns[1].GetBytes())
+	fmt.Printlnf("Query done [% x]", row.Columns[1].GetBytes())
 
 	return row.Columns[1].GetBytes(), nil
 }
