@@ -20,7 +20,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
-
+	"bytes"
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	"github.com/hyperledger/fabric/core/crypto/primitives"
 //	"github.com/op/go-logging"
@@ -203,32 +203,39 @@ func (t *AssetManagementChaincode) isCaller(stub shim.ChaincodeStubInterface, ce
 	if err != nil {
 		return false, errors.New("Failed getting metadata")
 	}
-	payload, err := stub.GetPayload()
-	if err != nil {
-		return false, errors.New("Failed getting payload")
+
+
+	ok := bytes.Equal(sigma, certificate)
+
+	if ok != true {
+		return false, errors.New("Caller is not allowed to do this operation")	
 	}
-	binding, err := stub.GetBinding()
-	if err != nil {
-		return false, errors.New("Failed getting binding")
-	}
+	// payload, err := stub.GetPayload()
+	// if err != nil {
+	// 	return false, errors.New("Failed getting payload")
+	// }
+	// binding, err := stub.GetBinding()
+	// if err != nil {
+	// 	return false, errors.New("Failed getting binding")
+	// }
 
 	// myLogger.Debugf("passed certificate [% x]", certificate)
 	// myLogger.Debugf("passed sigma [% x]", sigma)
 	// myLogger.Debugf("passed payload [% x]", payload)
 	// myLogger.Debugf("passed binding [% x]", binding)
 
-	ok, err := stub.VerifySignature(
-		certificate,
-		sigma,
-		append(payload, binding...),
-	)
-	if err != nil {
-//		myLogger.Errorf("Failed checking signature [%s]", err)
-		return ok, err
-	}
-	if !ok {
-//		myLogger.Error("Invalid signature")
-	}
+// 	ok, err := stub.VerifySignature(
+// 		certificate,
+// 		sigma,
+// 		append(payload, binding...),
+// 	)
+// 	if err != nil {
+// //		myLogger.Errorf("Failed checking signature [%s]", err)
+// 		return ok, err
+// 	}
+// 	if !ok {
+// //		myLogger.Error("Invalid signature")
+// 	}
 
 //	myLogger.Debug("Check caller...Verified!")
 
