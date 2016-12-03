@@ -103,7 +103,7 @@ func (t *AssetManagementChaincode) assign(stub shim.ChaincodeStubInterface, args
 	}
 
 	// Register assignment
-	fmt.Printlnf("New owner of [%s] is [% x]", asset, owner)
+	fmt.Println("New owner of [%s] is [% x]", asset, owner)
 
 	ok, err = stub.InsertRow("AssetsOwnership", shim.Row{
 		Columns: []*shim.Column{
@@ -145,7 +145,7 @@ func (t *AssetManagementChaincode) transfer(stub shim.ChaincodeStubInterface, ar
 	}
 
 	prvOwner := row.Columns[1].GetBytes()
-	fmt.Printlnf("Previous owener of [%s] is [% x]", asset, prvOwner)
+	fmt.Println("Previous owener of [%s] is [% x]", asset, prvOwner)
 	if len(prvOwner) == 0 {
 		return nil, fmt.Errorf("Invalid previous owner. Nil")
 	}
@@ -219,10 +219,10 @@ func (t *AssetManagementChaincode) isCaller(stub shim.ChaincodeStubInterface, ce
 	// 	return false, errors.New("Failed getting binding")
 	// }
 
-	// fmt.Printlnf("passed certificate [% x]", certificate)
-	// fmt.Printlnf("passed sigma [% x]", sigma)
-	// fmt.Printlnf("passed payload [% x]", payload)
-	// fmt.Printlnf("passed binding [% x]", binding)
+	// fmt.Println("passed certificate [% x]", certificate)
+	// fmt.Println("passed sigma [% x]", sigma)
+	// fmt.Println("passed payload [% x]", payload)
+	// fmt.Println("passed binding [% x]", binding)
 
 // 	ok, err := stub.VerifySignature(
 // 		certificate,
@@ -268,7 +268,7 @@ func (t *AssetManagementChaincode) Invoke(stub shim.ChaincodeStubInterface, func
 // "query(asset)": returns the owner of the asset.
 // Anyone can invoke this function.
 func (t *AssetManagementChaincode) Query(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
-	fmt.Printlnf("Query [%s]", function)
+	fmt.Println("Query [%s]", function)
 
 	if function != "query" {
 		return nil, errors.New("Invalid query function name. Expecting 'query' but found '" + function + "'")
@@ -284,7 +284,7 @@ func (t *AssetManagementChaincode) Query(stub shim.ChaincodeStubInterface, funct
 	// Who is the owner of the asset?
 	asset := args[0]
 
-	fmt.Printlnf("Arg [%s]", string(asset))
+	fmt.Println("Arg [%s]", string(asset))
 
 	var columns []shim.Column
 	col1 := shim.Column{Value: &shim.Column_String_{String_: asset}}
@@ -292,11 +292,11 @@ func (t *AssetManagementChaincode) Query(stub shim.ChaincodeStubInterface, funct
 
 	row, err := stub.GetRow("AssetsOwnership", columns)
 	if err != nil {
-		fmt.Printlnf("Failed retriving asset [%s]: [%s]", string(asset), err)
+		fmt.Println("Failed retriving asset [%s]: [%s]", string(asset), err)
 		return nil, fmt.Errorf("Failed retriving asset [%s]: [%s]", string(asset), err)
 	}
 
-	fmt.Printlnf("Query done [% x]", row.Columns[1].GetBytes())
+	fmt.Println("Query done [% x]", row.Columns[1].GetBytes())
 
 	return row.Columns[1].GetBytes(), nil
 }
