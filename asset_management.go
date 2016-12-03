@@ -39,7 +39,7 @@ type AssetManagementChaincode struct {
 // Init method will be called during deployment.
 // The deploy transaction metadata is supposed to contain the administrator cert
 func (t *AssetManagementChaincode) Init(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
-//	myLogger.Debug("Init Chaincode...")
+	fmt.Println("Init Chaincode... logger-working")
 	if len(args) != 0 {
 		return nil, errors.New("Incorrect number of arguments. Expecting 0")
 	}
