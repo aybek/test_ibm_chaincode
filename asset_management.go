@@ -96,6 +96,7 @@ func (t *AssetManagementChaincode) createInvoice(stub shim.ChaincodeStubInterfac
 	}
 
 	deliveryDate := args[2]
+
 	supplierId, err := strconv.Atoi(args[3])
 	if err != nil {
 		throwError := errors.New("Expecting integer value for invoice supplierId")
@@ -121,28 +122,32 @@ func (t *AssetManagementChaincode) createInvoice(stub shim.ChaincodeStubInterfac
 	}
 	fmt.Println("Buyer cert bytes = ", buyer)	
 
+//************************************************************************
+	//Enable this when membersrvc conf available
 
 	// Verify the identity of the caller
 	// Only a supplier can create an invoice
-	supplierRole, err := stub.GetState("supplierRole")
+	// supplierRole, err := stub.GetState("supplierRole")
 
-	if err != nil {
-		return nil, errors.New("Failed fetching supplier identity")
-	}
+	// if err != nil {
+	// 	return nil, errors.New("Failed fetching supplier identity")
+	// }
 
-	callerRole, err := stub.ReadCertAttribute("role")
-	if err != nil {
-		fmt.Printf("Error reading attribute 'role' [%v] \n", err)
-		return nil, fmt.Errorf("Failed fetching caller role. Error was [%v]", err)
-	}
 
-	caller := string(callerRole[:])
-	supplierStr := string(supplierRole[:])
+	// callerRole, err := stub.ReadCertAttribute("role")
+	// if err != nil {
+	// 	fmt.Printf("Error reading attribute 'role' [%v] \n", err)
+	// 	return nil, fmt.Errorf("Failed fetching caller role. Error was [%v]", err)
+	// }
 
-	if caller != supplierStr {
-		fmt.Printf("Caller is not supplier - caller %v assigner %v\n", caller, supplierStr)
-		return nil, fmt.Errorf("The caller does not have the rights to invoke create invoice. Expected role [%v], caller role [%v]", supplierStr, caller)
-	}
+	// caller := string(callerRole[:])
+	// supplierStr := string(supplierRole[:])
+
+	// if caller != supplierStr {
+	// 	fmt.Printf("Caller is not supplier - caller %v assigner %v\n", caller, supplierStr)
+	// 	return nil, fmt.Errorf("The caller does not have the rights to invoke create invoice. Expected role [%v], caller role [%v]", supplierStr, caller)
+	// }
+//***********************************************************************8	
 
 	// Create an invoice
 	fmt.Println("Creating new invoice, number: [%s] ,price: [%s], deliveryDate: [%s], supplier is [% x], buyer is [% x]",number,price,deliveryDate, supplier,buyer)
@@ -436,6 +441,9 @@ func (t *AssetManagementChaincode) isCaller(stub shim.ChaincodeStubInterface, ce
 	if ok != true {
 		return false, errors.New("Caller is not allowed to do this operation")	
 	}
+//************************************************************************
+	//Enable this when signature is available
+
 	// payload, err := stub.GetPayload()
 	// if err != nil {
 	// 	return false, errors.New("Failed getting payload")
@@ -466,6 +474,7 @@ func (t *AssetManagementChaincode) isCaller(stub shim.ChaincodeStubInterface, ce
 	fmt.Println("Check caller...Verified!")
 
 	return ok, err
+//************************************************************************
 }
 
 // Invoke will be called for every transaction.
