@@ -287,7 +287,8 @@ func (t *AssetManagementChaincode) createPaymentRequest(stub shim.ChaincodeStubI
 		throwError := errors.New("Expecting integer value for discountRate")
 		return errorJson("createPaymentRequest", throwError), throwError
 	}
-	
+
+	requestDate := args[3]
 	
 	fmt.Println("Payment request id = ", number)
     fmt.Println("Invoice number = ", number)	
@@ -336,6 +337,38 @@ func (t *AssetManagementChaincode) createPaymentRequest(stub shim.ChaincodeStubI
 
 	if !ok && err == nil {
 		return nil, errors.New("payment request with this id was already created.")
+	}
+
+	//Update invoice request date
+
+	supplier := row.Columns[8].GetBytes()
+	buyerId := row.Columns[7].GetInt32()
+	supplierId := row.Columns[6].GetInt32()
+	deliveryDate := row.Columns[3].GetString_()
+	paymentDate := row.Columns[5].GetString_()
+	price := row.Columns[1].GetInt32()
+	status := row.Columns[2].GetString_()
+
+	// update from balance
+	_, err = stub.ReplaceRow(
+		"Invoice",
+		shim.Row{
+			Columns: []*shim.Column{
+			&shim.Column{Value: &shim.Column_Int32{Int32: int32(number)}},
+			&shim.Column{Value: &shim.Column_Int32{Int32: int32(price)}},
+			&shim.Column{Value: &shim.Column_String_{String_: status}},
+			&shim.Column{Value: &shim.Column_String_{String_: deliveryDate}},
+			&shim.Column{Value: &shim.Column_String_{String_: requestDate}},
+			&shim.Column{Value: &shim.Column_String_{String_: paymentDate}},
+			&shim.Column{Value: &shim.Column_Int32{Int32: int32(supplierId)}},
+			&shim.Column{Value: &shim.Column_Int32{Int32: int32(buyerId)}},
+			&shim.Column{Value: &shim.Column_Bytes{Bytes: supplier}},
+			&shim.Column{Value: &shim.Column_Bytes{Bytes: realBuyer}}},
+			},
+		)
+	if err != nil {
+		throwError := errors.New("Failed update status row.")
+		return errorJson("transfer", throwError), throwError
 	}
 
 	fmt.Println("Create payment request...done!")
